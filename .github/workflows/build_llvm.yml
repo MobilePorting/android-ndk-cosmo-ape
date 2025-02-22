@@ -12,17 +12,6 @@ on:
         # bolt;clang;clang-tools-extra;compiler-rt;cross-project-tests;libc;libclc;lld;lldb;mlir;openmp;polly;pstl;flang
         default: "clang;clang-tools-extra;lld"
         required: false
-  workflow_call:
-    inputs:
-      version:
-        description: "Release version:"
-        default: "19.1.7"
-        required: false
-      projects:
-        description: "Projects to build:"
-        # bolt;clang;clang-tools-extra;compiler-rt;cross-project-tests;libc;libclc;lld;lldb;mlir;openmp;polly;pstl;flang
-        default: "clang;clang-tools-extra;lld"
-        required: false
 
 jobs:
   build:
