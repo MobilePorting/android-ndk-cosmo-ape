@@ -1,4 +1,4 @@
-name: Make NDK COSMO APE
+name: Make NDK APE
 run-name: Make NDK-r${{inputs.ndk_version}} with llvm-${{inputs.llvm_version}}-ape
 on:
   workflow_dispatch:
@@ -15,12 +15,24 @@ on:
         type: string
 
 jobs:
+  build_llvm:
+    uses: ./.github/workflows/llvm_build.yml
+    with:
+      version: ${{inputs.llvm_version}}
+
   make:
+    needs: [build_llvm]
     name: Make NDK APE
     runs-on: ubuntu-latest
     steps:
       - name: Get NDK
         run: curl -LkSs https://dl.google.com/android/repository/android-ndk-r${{inputs.ndk_version}}-linux.zip >ndk.zip && unzip -q ndk.zip
+
+      - name: Get LLVM
+        uses: actions/download-artifact@v4
+
+      - name: Extract LLVM
+        run: tar -xJf clang+clang-tools-extra+lld-${{inputs.llvm_version}}-ape-tiny.tar.xz
 
       - name: Make NDK APE
         run: |
@@ -55,8 +67,7 @@ jobs:
           mv android-ndk-r${{inputs.ndk_version}} android-ndk-r${{inputs.ndk_version}}-ape
 
       - name: Archive
-        run: |
-          tar -c android-ndk-r${{inputs.ndk_version}}-ape >android-ndk-r${{inputs.ndk_version}}-ape.tar
+        run: tar -c android-ndk-r${{inputs.ndk_version}}-ape >android-ndk-r${{inputs.ndk_version}}-ape.tar
 
       - uses: actions/upload-artifact@v4
         with:
@@ -127,7 +138,7 @@ jobs:
     - name: Release
       uses: ncipollo/release-action@v1.15.0
       with:
-        tag: "${{inputs.ndk_version}}"
+        tag: "r${{inputs.ndk_version}}"
         artifacts: android-ndk-r${{inputs.ndk_version}}-ape.tar.xz
         allowUpdates: true
         replacesArtifacts: true
