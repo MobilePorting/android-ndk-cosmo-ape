@@ -16,7 +16,7 @@ on:
 
 jobs:
   build_llvm:
-    uses: ./.github/workflows/llvm_build.yml
+    uses: ./.github/workflows/build_llvm.yml
     with:
       version: ${{inputs.llvm_version}}
 
