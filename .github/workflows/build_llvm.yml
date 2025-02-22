@@ -1,17 +1,33 @@
 name: Build LLVM
 run-name: Build llvm-${{inputs.version}} ${{inputs.projects}}
 on:
+  workflow_call:
+    inputs:
+      version:
+        description: "Release version:"
+        default: "19.1.7"
+        required: false
+        type: string
+      projects:
+        description: "Projects to build:"
+        # bolt;clang;clang-tools-extra;compiler-rt;cross-project-tests;libc;libclc;lld;lldb;mlir;openmp;polly;pstl;flang
+        default: "clang;clang-tools-extra;lld"
+        required: false
+        type: string
+
   workflow_dispatch:
     inputs:
       version:
         description: "Release version:"
         default: "19.1.7"
         required: false
+        type: string
       projects:
         description: "Projects to build:"
         # bolt;clang;clang-tools-extra;compiler-rt;cross-project-tests;libc;libclc;lld;lldb;mlir;openmp;polly;pstl;flang
         default: "clang;clang-tools-extra;lld"
         required: false
+        type: string
 
 jobs:
   build:
