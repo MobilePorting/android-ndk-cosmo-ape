@@ -30,6 +30,8 @@ jobs:
 
       - name: Get LLVM
         uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
 
       - name: Extract LLVM
         run: tar -xJf clang+clang-tools-extra+lld-${{inputs.llvm_version}}-ape.tar.xz
