@@ -71,6 +71,24 @@ jobs:
           mkdir -p "${NDK_TOOLCHAIN}/python3/bin"
           curl -LkSs https://cosmo.zip/pub/cosmos/bin/python >"${NDK_TOOLCHAIN}/python3/bin/python3" && chmod +x "${NDK_TOOLCHAIN}/python3/bin/python3"
 
+          cd ${NDK}/toolchains/llvm/prebuilt/linux-x86_64
+          ln -s clang-19 clang.exe
+          ln -s clang-19 clang++.exe
+          for file in llvm-*; do
+             ln -s "$file" "$file.exe"
+          done
+          cd ..
+
+          mv ${NDK}/prebuilt/linux-x86_64 ${NDK}/prebuilt/cosmo-universal
+          mv ${NDK}/toolchains/llvm/prebuilt/linux-x86_64 ${NDK}/toolchains/llvm/prebuilt/cosmo-universal
+
+          ln -s cosmo-universal linux-x86_64
+          ln -s cosmo-universal linux-arm64
+          ln -s cosmo-universal windows-x86_64
+          ln -s cosmo-universal windows-arm64
+          ln -s cosmo-universal darwin-x86_64
+          ln -s cosmo-universal darwin-arm64
+
           mv android-ndk-r${{inputs.ndk_version}} android-ndk-r${{inputs.ndk_version}}-ape
 
       - name: Archive
