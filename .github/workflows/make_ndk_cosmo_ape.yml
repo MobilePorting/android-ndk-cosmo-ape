@@ -44,7 +44,7 @@ jobs:
       - name: Make NDK APE
         run: |
           NDK="${PWD}/android-ndk-r${{inputs.ndk_version}}"
-          HOST_TOOLCHAIN="${PWD}/clang+clang-tools-extra+lld-${{inputs.llvm_version}}-ape-tiny"
+          HOST_TOOLCHAIN="${PWD}/clang+clang-tools-extra+lld-${{inputs.llvm_version}}-ape"
           NDK_TOOLCHAIN="${NDK}/toolchains/llvm/prebuilt/linux-x86_64"
 
           find "${NDK_TOOLCHAIN}/bin" -type f | while IFS= read -r file; do
