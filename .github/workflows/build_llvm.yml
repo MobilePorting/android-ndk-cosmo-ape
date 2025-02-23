@@ -221,6 +221,8 @@ jobs:
           merge-multiple: true
 
       - uses: geekyeggo/delete-artifact@v5.1.0
+        with:
+          name: llvm-*
 
       - name: Extract artifacts
         run: |
