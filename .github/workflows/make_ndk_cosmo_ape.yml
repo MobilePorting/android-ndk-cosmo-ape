@@ -89,6 +89,17 @@ jobs:
           ln -s cosmo-universal darwin-x86_64
           ln -s cosmo-universal darwin-arm64
 
+          cd ${NDK}/prebuilt/cosmo-universal
+
+          ln -s cosmo-universal linux-x86_64
+          ln -s cosmo-universal linux-arm64
+          ln -s cosmo-universal windows-x86_64
+          ln -s cosmo-universal windows-arm64
+          ln -s cosmo-universal darwin-x86_64
+          ln -s cosmo-universal darwin-arm64
+
+          rm -rf ${NDK}/shader-tools # TODO: maybe build?
+
           mv android-ndk-r${{inputs.ndk_version}} android-ndk-r${{inputs.ndk_version}}-ape
 
       - name: Archive
