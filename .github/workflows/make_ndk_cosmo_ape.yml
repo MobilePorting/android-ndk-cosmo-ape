@@ -117,10 +117,6 @@ jobs:
               file "$o"
           done
 
-      - uses: zongou/run-vscode-server@0.0.1
-        name: Open VS Code server to Handle Failure (Run on any failure)
-        if: ${{ failure() }}
-
   release:
     needs: test
     name: Release
