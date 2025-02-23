@@ -100,6 +100,8 @@ jobs:
 
           rm -rf ${NDK}/shader-tools # TODO: maybe build?
 
+          cd ${NDK}/..
+
           mv android-ndk-r${{inputs.ndk_version}} android-ndk-r${{inputs.ndk_version}}-ape
 
       - name: Archive
