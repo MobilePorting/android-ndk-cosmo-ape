@@ -103,7 +103,7 @@ jobs:
           rm -rf ${NDK}/shader-tools # TODO: maybe build?
 
       - name: Archive
-        run: tar -cvhf android-ndk-r${{inputs.ndk_version}}.tar android-ndk-r${{inputs.ndk_version}}.tar
+        run: tar -cvhf android-ndk-r${{inputs.ndk_version}}.tar android-ndk-r${{inputs.ndk_version}}
 
       - uses: actions/upload-artifact@v4
         with:
