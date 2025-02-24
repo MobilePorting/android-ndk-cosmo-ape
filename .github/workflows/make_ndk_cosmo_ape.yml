@@ -71,7 +71,7 @@ jobs:
           mkdir -p "${NDK_TOOLCHAIN}/python3/bin"
           curl -LkSs https://cosmo.zip/pub/cosmos/bin/python >"${NDK_TOOLCHAIN}/python3/bin/python3" && chmod +x "${NDK_TOOLCHAIN}/python3/bin/python3"
 
-          cd ${NDK}/toolchains/llvm/prebuilt/linux-x86_64
+          cd ${NDK}/toolchains/llvm/prebuilt/linux-x86_64/bin
           ln -s clang-19 clang.exe
           ln -s clang-19 clang++.exe
           for file in llvm-*; do
@@ -82,6 +82,8 @@ jobs:
           mv ${NDK}/prebuilt/linux-x86_64 ${NDK}/prebuilt/cosmo-universal
           mv ${NDK}/toolchains/llvm/prebuilt/linux-x86_64 ${NDK}/toolchains/llvm/prebuilt/cosmo-universal
 
+          cd ${NDK}/toolchains/llvm/prebuilt
+
           ln -s cosmo-universal linux-x86_64
           ln -s cosmo-universal linux-arm64
           ln -s cosmo-universal windows-x86_64
@@ -89,7 +91,7 @@ jobs:
           ln -s cosmo-universal darwin-x86_64
           ln -s cosmo-universal darwin-arm64
 
-          cd ${NDK}/prebuilt/cosmo-universal
+          cd ${NDK}/prebuilt
 
           ln -s cosmo-universal linux-x86_64
           ln -s cosmo-universal linux-arm64
@@ -101,7 +103,7 @@ jobs:
           rm -rf ${NDK}/shader-tools # TODO: maybe build?
 
       - name: Archive
-        run: tar -c android-ndk-r${{inputs.ndk_version}} >android-ndk-r${{inputs.ndk_version}}.tar
+        run: tar -cvhf android-ndk-r${{inputs.ndk_version}} >android-ndk-r${{inputs.ndk_version}}.tar
 
       - uses: actions/upload-artifact@v4
         with:
