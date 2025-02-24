@@ -125,7 +125,7 @@ jobs:
           merge-multiple: true
 
       - name: Extract artifacts
-        run: tar -xf android-ndk-r${{inputs.ndk_version}}-ape.tar
+        run: tar -xf android-ndk-r${{inputs.ndk_version}}.tar
 
       - name: Test
         shell: bash
