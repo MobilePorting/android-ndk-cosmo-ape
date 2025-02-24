@@ -100,17 +100,13 @@ jobs:
 
           rm -rf ${NDK}/shader-tools # TODO: maybe build?
 
-          cd ${NDK}/..
-
-          mv android-ndk-r${{inputs.ndk_version}} android-ndk-r${{inputs.ndk_version}}-ape
-
       - name: Archive
-        run: tar -c android-ndk-r${{inputs.ndk_version}}-ape >android-ndk-r${{inputs.ndk_version}}-ape.tar
+        run: tar -c android-ndk-r${{inputs.ndk_version}} >android-ndk-r${{inputs.ndk_version}}.tar
 
       - uses: actions/upload-artifact@v4
         with:
-          name: android-ndk-r${{inputs.ndk_version}}-ape.tar
-          path: android-ndk-r${{inputs.ndk_version}}-ape.tar
+          name: android-ndk-r${{inputs.ndk_version}}.tar
+          path: android-ndk-r${{inputs.ndk_version}}.tar
 
   test:
     needs: make
@@ -135,7 +131,7 @@ jobs:
         shell: bash
         run: |
           NDK="${PWD}/android-ndk-r${{inputs.ndk_version}}"
-          NDK_TOOLCHAIN="${NDK}/toolchains/llvm/prebuilt/linux-x86_64"
+          NDK_TOOLCHAIN="${NDK}/toolchains/llvm/prebuilt/cosmo-universal"
 
           grep '"triple"' <"${NDK}/meta/abis.json" | awk -F"\"" '{print $4}' | while IFS= read -r triple; do
               # find ${NDK_TOOLCHAIN}/sysroot/usr/lib -maxdepth 1 -mindepth 1 | while IFS= read -r triple; do
@@ -167,13 +163,13 @@ jobs:
       
     - name: Compress
       run: |
-        xz -T0 android-ndk-r${{inputs.ndk_version}}-ape.tar
+        xz -T0 android-ndk-r${{inputs.ndk_version}}.tar
 
     - name: Release
       uses: ncipollo/release-action@v1.15.0
       with:
         tag: "r${{inputs.ndk_version}}"
-        artifacts: android-ndk-r${{inputs.ndk_version}}-ape.tar.xz
+        artifacts: android-ndk-r${{inputs.ndk_version}}.tar.xz
         allowUpdates: true
         replacesArtifacts: true
         body: |
