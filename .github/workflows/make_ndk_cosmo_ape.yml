@@ -82,12 +82,74 @@ jobs:
           mv ${NDK}/prebuilt/linux-x86_64 ${NDK}/prebuilt/cosmo-universal
           mv ${NDK}/toolchains/llvm/prebuilt/linux-x86_64 ${NDK}/toolchains/llvm/prebuilt/cosmo-universal
 
+          rm -rf ${NDK}/shader-tools # TODO: maybe build?
+
+      - name: Archive
+        run: tar -c android-ndk-r${{inputs.ndk_version}} >android-ndk-r${{inputs.ndk_version}}-unfixed.tar
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-ndk-r${{inputs.ndk_version}}-unfixed
+          path: android-ndk-r${{inputs.ndk_version}}-unfixed.tar
+
+  windows_fix:
+    needs: make
+    name: Windows Fix
+    runs-on: windows-latest
+    steps:
+      - uses: milliewalky/setup-7-zip@v2
+
+      - name: Get Unfixed NDK
+        uses: actions/download-artifact@v4
+        with:
+          name: android-ndk-r${{inputs.ndk_version}}-unfixed
+          merge-multiple: true
+
+      - name: Fix Links
+        shell: pwsh
+        run: |
+          $NDK = "$PWD/android-ndk-r${{inputs.ndk_version}}"
+          $NDK_TOOLCHAIN = "$NDK/toolchains/llvm/prebuilt/cosmo-universal"
+
+          cd ${NDK}/toolchains/llvm/prebuilt
+
+          New-Item -ItemType SymbolicLink -Path "windows-x86_64" -Target "cosmo-universal"
+          New-Item -ItemType SymbolicLink -Path "windows-arm64" -Target "cosmo-universal"
+
+          cd ${NDK}/prebuilt
+
+          New-Item -ItemType SymbolicLink -Path "windows-x86_64" -Target "cosmo-universal"
+          New-Item -ItemType SymbolicLink -Path "windows-arm64" -Target "cosmo-universal"
+
+      - name: Archive Fixed NDK
+        run: 7z a -snl -tzip -mx=9 -mm=Deflate64 -mmt=on android-ndk-r${{inputs.ndk_version}}-windows.zip android-ndk-r${{inputs.ndk_version}}
+
+      - name: Upload Fixed NDK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-ndk-r${{inputs.ndk_version}}-windows
+          path: android-ndk-r${{inputs.ndk_version}}-windows.zip
+
+  unix_fix:
+    needs: make
+    name: Unix Fix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Unfixed NDK
+        uses: actions/download-artifact@v4
+        with:
+          name: android-ndk-r${{inputs.ndk_version}}-unfixed
+          merge-multiple: true
+
+      - name: Fix Links
+        run: |
+          NDK="${PWD}/android-ndk-r${{inputs.ndk_version}}"
+          NDK_TOOLCHAIN="${NDK}/toolchains/llvm/prebuilt/cosmo-universal"
+
           cd ${NDK}/toolchains/llvm/prebuilt
 
           ln -s cosmo-universal linux-x86_64
           ln -s cosmo-universal linux-arm64
-          ln -s cosmo-universal windows-x86_64
-          ln -s cosmo-universal windows-arm64
           ln -s cosmo-universal darwin-x86_64
           ln -s cosmo-universal darwin-arm64
 
@@ -95,43 +157,40 @@ jobs:
 
           ln -s cosmo-universal linux-x86_64
           ln -s cosmo-universal linux-arm64
-          ln -s cosmo-universal windows-x86_64
-          ln -s cosmo-universal windows-arm64
           ln -s cosmo-universal darwin-x86_64
           ln -s cosmo-universal darwin-arm64
 
-          rm -rf ${NDK}/shader-tools # TODO: maybe build?
+      - name: Archive Fixed NDK
+        run: tar -cf - android-ndk-r${{inputs.ndk_version}} | xz -T0 -9e --lzma2=dict=256MiB > android-ndk-r${{inputs.ndk_version}}-unix.tar.xz
 
-      - name: Archive
-        run: tar -cvhf android-ndk-r${{inputs.ndk_version}}.tar android-ndk-r${{inputs.ndk_version}}
-
-      - uses: actions/upload-artifact@v4
+      - name: Upload Fixed NDK
+        uses: actions/upload-artifact@v4
         with:
-          name: android-ndk-r${{inputs.ndk_version}}.tar
-          path: android-ndk-r${{inputs.ndk_version}}.tar
+          name: android-ndk-r${{inputs.ndk_version}}-unix
+          path: android-ndk-r${{inputs.ndk_version}}-unix.tar.xz
 
   release:
-    needs: make
+    needs: [unix_fix, windows_fix]
     name: Release
     permissions:
       contents: write
       actions: write
     runs-on: ubuntu-latest
     steps:
+    - uses: geekyeggo/delete-artifact@v5.1.0
+      with:
+        name: android-ndk-r${{inputs.ndk_version}}-unfixed
+
     - name: Download artifacts
       uses: actions/download-artifact@v4
       with:
         merge-multiple: true
-      
-    - name: Compress
-      run: |
-        xz -T0 android-ndk-r${{inputs.ndk_version}}.tar
 
     - name: Release
       uses: ncipollo/release-action@v1.15.0
       with:
         tag: "r${{inputs.ndk_version}}"
-        artifacts: android-ndk-r${{inputs.ndk_version}}.tar.xz
+        artifacts: android-ndk-r${{inputs.ndk_version}}*
         allowUpdates: true
         replacesArtifacts: true
         body: |
