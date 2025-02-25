@@ -181,7 +181,7 @@ jobs:
             -DLLVM_ENABLE_UNWIND_TABLES=OFF \
             -DLLVM_ENABLE_EH=OFF \
             -DLLVM_ENABLE_RTTI=OFF \
-            -DLLVM_ENABLE_LTO=OFF \
+            -DLLVM_ENABLE_LTO=ON \
             -DLLVM_ENABLE_MODULES=OFF \
             -DLLVM_ENABLE_PEDANTIC=OFF \
             -DLLVM_ENABLE_FFI=OFF \
