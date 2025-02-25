@@ -181,7 +181,7 @@ jobs:
             -DLLVM_ENABLE_UNWIND_TABLES=OFF \
             -DLLVM_ENABLE_EH=OFF \
             -DLLVM_ENABLE_RTTI=OFF \
-            -DLLVM_ENABLE_LTO=ON \
+            -DLLVM_ENABLE_LTO=OFF \
             -DLLVM_ENABLE_MODULES=OFF \
             -DLLVM_ENABLE_PEDANTIC=OFF \
             -DLLVM_ENABLE_FFI=OFF \
@@ -207,10 +207,6 @@ jobs:
         with:
           name: llvm-${{matrix.target}}
           path: llvm-${{matrix.target}}.tar
-      
-      - uses: zongou/run-vscode-server@0.0.3
-        name: Open VS Code server to Handle Failure (Run on any failure)
-        if: ${{ failure() }}
 
   ape-link:
     needs: build
