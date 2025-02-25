@@ -22,12 +22,12 @@ jobs:
       - name: Get NDK and LLVM
         run: |
           curl -LkSs https://dl.google.com/android/repository/android-ndk-r${{inputs.ndk_version}}-linux.zip >ndk.zip && unzip -q ndk.zip
-          curl -LkSs https://github.com/zongou/build/releases/download/llvm-${{inputs.llvm_version}}/clang+clang-tools-extra+lld-${{inputs.llvm_version}}-ape.tar.xz | xz -d | tar -d
+          curl -LkSs https://github.com/zongou/build/releases/download/llvm-${{inputs.llvm_version}}/bolt+clang+clang-tools-extra+lld+lldb-${{inputs.llvm_version}}-ape.tar.xz | xz -d | tar -d
 
       - name: Make NDK APE
         run: |
           NDK="${PWD}/android-ndk-r${{inputs.ndk_version}}"
-          HOST_TOOLCHAIN="${PWD}/bolt+clang+clang-tools-extra+compiler-rt+lld+lldb-${{inputs.llvm_version}}-ape"
+          HOST_TOOLCHAIN="${PWD}/bolt+clang+clang-tools-extra+lld+lldb-${{inputs.llvm_version}}-ape"
           NDK_TOOLCHAIN="${NDK}/toolchains/llvm/prebuilt/linux-x86_64"
 
           find "${NDK_TOOLCHAIN}/bin" -type f | while IFS= read -r file; do
