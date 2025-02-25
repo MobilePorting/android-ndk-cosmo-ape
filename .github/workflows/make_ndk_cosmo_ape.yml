@@ -31,20 +31,20 @@ jobs:
       - name: Get LLVM
         uses: actions/download-artifact@v4
         with:
-          name: clang+clang-tools-extra+lld-${{inputs.llvm_version}}-ape
+          name: bolt+clang+clang-tools-extra+compiler-rt+lld+lldb-${{inputs.llvm_version}}-ape
           merge-multiple: true
 
       - uses: geekyeggo/delete-artifact@v5.1.0
         with:
-          name: clang+clang-tools-extra+lld-${{inputs.llvm_version}}-ape
+          name: bolt+clang+clang-tools-extra+compiler-rt+lld+lldb-${{inputs.llvm_version}}-ape
 
       - name: Extract LLVM
-        run: tar -xJf clang+clang-tools-extra+lld-${{inputs.llvm_version}}-ape.tar.xz
+        run: tar -xJf bolt+clang+clang-tools-extra+compiler-rt+lld+lldb-${{inputs.llvm_version}}-ape.tar.xz
 
       - name: Make NDK APE
         run: |
           NDK="${PWD}/android-ndk-r${{inputs.ndk_version}}"
-          HOST_TOOLCHAIN="${PWD}/clang+clang-tools-extra+lld-${{inputs.llvm_version}}-ape"
+          HOST_TOOLCHAIN="${PWD}/bolt+clang+clang-tools-extra+compiler-rt+lld+lldb-${{inputs.llvm_version}}-ape"
           NDK_TOOLCHAIN="${NDK}/toolchains/llvm/prebuilt/linux-x86_64"
 
           find "${NDK_TOOLCHAIN}/bin" -type f | while IFS= read -r file; do
@@ -55,6 +55,10 @@ jobs:
               elif file "${file}" | grep -q 'Bourne-Again shell script'; then
                   echo "Replacing SheBang ${bname}"
                   sed -i 's,#!/usr/bin/env bash,#!/usr/bin/env sh,' "${file}"
+
+              if file "${file}" | grep -q 'ELF'; then
+                  echo "Removing ${file}"
+                  rm ${file}
               fi
           done
 
@@ -70,14 +74,6 @@ jobs:
           curl -LkSs https://cosmo.zip/pub/cosmos/bin/make > "${NDK}/prebuilt/linux-x86_64/bin/make" && chmod +x "${NDK}/prebuilt/linux-x86_64/bin/make"
           mkdir -p "${NDK_TOOLCHAIN}/python3/bin"
           curl -LkSs https://cosmo.zip/pub/cosmos/bin/python >"${NDK_TOOLCHAIN}/python3/bin/python3" && chmod +x "${NDK_TOOLCHAIN}/python3/bin/python3"
-
-          cd ${NDK}/toolchains/llvm/prebuilt/linux-x86_64/bin
-          ln -s clang-19 clang.exe
-          ln -s clang-19 clang++.exe
-          for file in llvm-*; do
-             ln -s "$file" "$file.exe"
-          done
-          cd ..
 
           mv ${NDK}/prebuilt/linux-x86_64 ${NDK}/prebuilt/cosmo-universal
           mv ${NDK}/toolchains/llvm/prebuilt/linux-x86_64 ${NDK}/toolchains/llvm/prebuilt/cosmo-universal
@@ -108,8 +104,30 @@ jobs:
       - name: Fix Links
         shell: pwsh
         run: |
+          function Get-FileType {
+            param ([string]$FilePath)
+            $fileExePath = "C:\Program Files\Git\usr\bin\file.exe"
+            $fileType = & "$fileExePath" $FilePath
+            Write-Host $fileType
+          }
+
           $NDK = "$PWD/android-ndk-r${{inputs.ndk_version}}"
           $NDK_TOOLCHAIN = "$NDK/toolchains/llvm/prebuilt/cosmo-universal"
+
+          foreach ($file in Get-ChildItem -Path "$NDK_TOOLCHAIN\bin" -File) {
+            $bname = $file.Name
+            $fileType = Get-FileType $file.FullName
+
+            if ($fileType -match "DOS/MBR boot sector") {
+              Write-Host "Renaming $bname"
+              Rename-Item -Path $file.FullName -NewName "$($file.FullName).exe"
+            }
+            elseif ($fileType -match "Bourne-Again shell script") {
+              # TODO
+              Write-Host "Deleting UNIX file $bname"
+              Remove-Item $file.FullName -Force
+            }
+          }
 
           cd ${NDK}/toolchains/llvm/prebuilt
 
