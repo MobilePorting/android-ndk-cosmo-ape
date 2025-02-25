@@ -15,31 +15,14 @@ on:
         type: string
 
 jobs:
-  build_llvm:
-    uses: ./.github/workflows/build_llvm.yml
-    with:
-      version: ${{inputs.llvm_version}}
-
   make:
-    needs: [build_llvm]
     name: Make NDK APE
     runs-on: ubuntu-latest
     steps:
-      - name: Get NDK
-        run: curl -LkSs https://dl.google.com/android/repository/android-ndk-r${{inputs.ndk_version}}-linux.zip >ndk.zip && unzip -q ndk.zip
-
-      - name: Get LLVM
-        uses: actions/download-artifact@v4
-        with:
-          name: bolt+clang+clang-tools-extra+compiler-rt+lld+lldb-${{inputs.llvm_version}}-ape
-          merge-multiple: true
-
-      - uses: geekyeggo/delete-artifact@v5.1.0
-        with:
-          name: bolt+clang+clang-tools-extra+compiler-rt+lld+lldb-${{inputs.llvm_version}}-ape
-
-      - name: Extract LLVM
-        run: tar -xJf bolt+clang+clang-tools-extra+compiler-rt+lld+lldb-${{inputs.llvm_version}}-ape.tar.xz
+      - name: Get NDK and LLVM
+        run: |
+          curl -LkSs https://dl.google.com/android/repository/android-ndk-r${{inputs.ndk_version}}-linux.zip >ndk.zip && unzip -q ndk.zip
+          curl -LkSs https://github.com/zongou/build/releases/download/llvm-${{inputs.llvm_version}}/clang+clang-tools-extra+lld-${{inputs.llvm_version}}-ape.tar.xz | xz -d | tar -d
 
       - name: Make NDK APE
         run: |
