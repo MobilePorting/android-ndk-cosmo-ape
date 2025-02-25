@@ -135,7 +135,9 @@ jobs:
           fi
 
       - name: Patch LLVM source code
-        run: curl -LkSs https://github.com/ahgamut/superconfigure/raw/refs/heads/main/compiler/llvm/minimal.diff | patch -up1
+        run: |
+          curl -LkSs https://github.com/ahgamut/superconfigure/raw/refs/heads/main/compiler/llvm/minimal.diff | patch -up1
+          curl -LkSs https://github.com/MobilePorting/android-ndk-cosmo-ape/raw/refs/heads/main/patches/llvm/0000-add-cosmopolitan-sanitizer-platform.patch | patch -up1
 
       - name: Build LLVM
         run: |
