@@ -38,7 +38,6 @@ jobs:
               elif file "${file}" | grep -q 'Bourne-Again shell script'; then
                   echo "Replacing SheBang ${bname}"
                   sed -i 's,#!/usr/bin/env bash,#!/usr/bin/env sh,' "${file}"
-                  file ${file}
               fi
 
               if file "${file}" | grep -q 'ELF'; then
@@ -110,10 +109,11 @@ jobs:
               Write-Host "Renaming $bname"
               Rename-Item -Path $file.FullName -NewName "$($file.FullName).exe"
             }
-            elseif ($fileType -match "Bourne-Again shell script") {
-              # TODO
-              Write-Host "Deleting UNIX file $bname"
+            elseif ($fileType -match "a sh script") {
+              Write-Host "Replacing UNIX file $bname"
               Remove-Item $file.FullName -Force
+              Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MobilePorting/android-ndk-cosmo-ape/refs/heads/main/windows-extra/$($file)" -OutFile "$($file.FullName)"
+              Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MobilePorting/android-ndk-cosmo-ape/refs/heads/main/windows-extra/$($file).cmd" -OutFile "$($file.FullName).cmd"
             }
           }
 
