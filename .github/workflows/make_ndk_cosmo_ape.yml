@@ -85,6 +85,9 @@ jobs:
           name: android-ndk-r${{inputs.ndk_version}}-unfixed
           merge-multiple: true
 
+      - name: Extract Unfixed NDK
+        run: C:\Program Files\Git\usr\bin\tar.exe -xJf android-ndk-r${{inputs.ndk_version}}-unfixed.tar
+
       - name: Fix Links
         shell: pwsh
         run: |
@@ -95,7 +98,7 @@ jobs:
             Write-Host $fileType
           }
 
-          $NDK = "$PWD/android-ndk-r${{inputs.ndk_version}}-unfixed"
+          $NDK = "$PWD/android-ndk-r${{inputs.ndk_version}}"
           $NDK_TOOLCHAIN = "$NDK/toolchains/llvm/prebuilt/cosmo-universal"
 
           foreach ($file in Get-ChildItem -Path "$NDK_TOOLCHAIN\bin" -File) {
@@ -143,9 +146,12 @@ jobs:
           name: android-ndk-r${{inputs.ndk_version}}-unfixed
           merge-multiple: true
 
+      - name: Extract Unfixed NDK
+        run: tar -xJf android-ndk-r${{inputs.ndk_version}}-unfixed.tar
+
       - name: Fix Links
         run: |
-          NDK="${PWD}/android-ndk-r${{inputs.ndk_version}}-unfixed"
+          NDK="${PWD}/android-ndk-r${{inputs.ndk_version}}"
           NDK_TOOLCHAIN="${NDK}/toolchains/llvm/prebuilt/cosmo-universal"
 
           cd ${NDK}/toolchains/llvm/prebuilt
