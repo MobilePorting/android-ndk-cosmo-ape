@@ -127,7 +127,7 @@ jobs:
           New-Item -ItemType SymbolicLink -Path "windows-arm64" -Target "cosmo-universal"
 
       - name: Archive Fixed NDK
-        run: 7z a -snl -tzip -mx=9 -mm=Deflate64 -mmt=on android-ndk-r${{inputs.ndk_version}}-windows.zip android-ndk-r${{inputs.ndk_version}}
+        run: 7z a -snl -t7z -mx=9 -m0=LZMA2 -md=256m -mfb=273 -mtc=on -mmt=on android-ndk-r${{inputs.ndk_version}}-windows.7z android-ndk-r${{inputs.ndk_version}}
 
       - name: Upload Fixed NDK
         uses: actions/upload-artifact@v4
