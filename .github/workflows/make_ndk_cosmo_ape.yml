@@ -86,7 +86,7 @@ jobs:
           merge-multiple: true
 
       - name: Extract Unfixed NDK
-        run: 7z x .\android-ndk-r${{inputs.ndk_version}}-unfixed.tar.gz
+        run: 7z x android-ndk-r${{inputs.ndk_version}}-unfixed.tar
 
       - name: Fix Links
         shell: pwsh
