@@ -38,6 +38,7 @@ jobs:
               elif file "${file}" | grep -q 'Bourne-Again shell script'; then
                   echo "Replacing SheBang ${bname}"
                   sed -i 's,#!/usr/bin/env bash,#!/usr/bin/env sh,' "${file}"
+                  file ${file}
               fi
 
               if file "${file}" | grep -q 'ELF'; then
@@ -86,7 +87,7 @@ jobs:
           merge-multiple: true
 
       - name: Extract Unfixed NDK
-        run: '"C:\Program Files\Git\usr\bin\tar.exe" -xf android-ndk-r${{inputs.ndk_version}}-unfixed.tar'
+        run: '& "C:\Program Files\Git\usr\bin\tar.exe" -xf android-ndk-r${{inputs.ndk_version}}-unfixed.tar'
 
       - name: Fix Links
         shell: pwsh
