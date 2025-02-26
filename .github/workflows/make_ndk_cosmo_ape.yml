@@ -86,7 +86,7 @@ jobs:
           merge-multiple: true
 
       - name: Extract Unfixed NDK
-        run: '& "C:\Program Files\Git\usr\bin\tar.exe" -xf android-ndk-r${{inputs.ndk_version}}-unfixed.tar'
+        run: '& "C:\Program Files\Git\usr\bin\bsdtar.exe" -xf android-ndk-r${{inputs.ndk_version}}-unfixed.tar'
 
       - name: Fix Links
         shell: pwsh
