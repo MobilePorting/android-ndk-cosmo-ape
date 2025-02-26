@@ -41,7 +41,7 @@ jobs:
               fi
 
               if file "${file}" | grep -q 'ELF'; then
-                  echo "Removing ${file}"
+                  echo "Removing ${bname}"
                   rm ${file}
               fi
           done
