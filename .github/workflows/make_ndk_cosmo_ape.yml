@@ -92,10 +92,9 @@ jobs:
         shell: pwsh
         run: |
           function Get-FileType {
-            param ([string]$FilePath)
-            $fileExePath = "C:\Program Files\Git\usr\bin\file.exe"
-            $fileType = & "$fileExePath" $FilePath
-            Write-Host $fileType
+              param ([string]$FilePath)
+              $fileExePath = "C:\Program Files\Git\usr\bin\file.exe"
+              return & "$fileExePath" $FilePath
           }
 
           $NDK = "$PWD/android-ndk-r${{inputs.ndk_version}}"
@@ -107,13 +106,13 @@ jobs:
 
             if ($fileType -match "DOS/MBR boot sector") {
               Write-Host "Renaming $bname"
-              Rename-Item -Path $file.FullName -NewName "$($file.FullName).exe"
+              Rename-Item -Path $file.FullName -NewName "$($file.Name).exe"
             }
             elseif ($fileType -match "a sh script") {
               Write-Host "Replacing UNIX file $bname"
               Remove-Item $file.FullName -Force
-              Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MobilePorting/android-ndk-cosmo-ape/refs/heads/main/windows-extra/$($file)" -OutFile "$($file.FullName)"
-              Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MobilePorting/android-ndk-cosmo-ape/refs/heads/main/windows-extra/$($file).cmd" -OutFile "$($file.FullName).cmd"
+              Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MobilePorting/android-ndk-cosmo-ape/main/windows-extra/$($file.Name)" -OutFile "$($file.FullName)"
+              Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MobilePorting/android-ndk-cosmo-ape/main/windows-extra/$($file.Name).cmd" -OutFile "$($file.FullName).cmd"
             }
           }
 
