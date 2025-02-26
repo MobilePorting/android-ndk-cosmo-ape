@@ -95,7 +95,7 @@ jobs:
             Write-Host $fileType
           }
 
-          $NDK = "$PWD/android-ndk-r${{inputs.ndk_version}}"
+          $NDK = "$PWD/android-ndk-r${{inputs.ndk_version}}-unfixed"
           $NDK_TOOLCHAIN = "$NDK/toolchains/llvm/prebuilt/cosmo-universal"
 
           foreach ($file in Get-ChildItem -Path "$NDK_TOOLCHAIN\bin" -File) {
@@ -145,7 +145,7 @@ jobs:
 
       - name: Fix Links
         run: |
-          NDK="${PWD}/android-ndk-r${{inputs.ndk_version}}"
+          NDK="${PWD}/android-ndk-r${{inputs.ndk_version}}-unfixed"
           NDK_TOOLCHAIN="${NDK}/toolchains/llvm/prebuilt/cosmo-universal"
 
           cd ${NDK}/toolchains/llvm/prebuilt
