@@ -133,7 +133,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: android-ndk-r${{inputs.ndk_version}}-windows
-          path: android-ndk-r${{inputs.ndk_version}}-windows.zip
+          path: android-ndk-r${{inputs.ndk_version}}-windows.7z
 
   unix_fix:
     needs: make
