@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+bin_dir=`dirname "$0"`
+if [ "$1" != "-cc1" ]; then
+    "$bin_dir/clang.exe" --target=aarch64-linux-android34 "$@"
+else
+    # Target is already an argument.
+    "$bin_dir/clang.exe" "$@"
+fi
