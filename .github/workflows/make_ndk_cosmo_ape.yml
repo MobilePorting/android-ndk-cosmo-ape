@@ -141,7 +141,7 @@ jobs:
           Remove-Item $NDK_TOOLCHAIN\bin\lld-link.exe
           Remove-Item $NDK_TOOLCHAIN\bin\lld.exe
           Remove-Item $NDK\prebuilt\*asm
-          Rename-Item -Path "$NDK\prebuilt\cosmo-universal\make" -NewName "$NDK\prebuilt\cosmo-universal\make.exe"
+          Rename-Item -Path "$NDK\prebuilt\cosmo-universal\bin\make" -NewName "$NDK\prebuilt\cosmo-universal\bin\make.exe"
           Rename-Item -Path "$NDK_TOOLCHAIN\python3\bin\python3" -NewName "$NDK_TOOLCHAIN\python3\bin\python3.exe"
           Copy-Item -Path "$NDK_TOOLCHAIN\bin\clang.exe" -Destination "$NDK_TOOLCHAIN\bin\clang-cl.exe" -Force
           cd ${NDK}/toolchains/llvm/prebuilt
