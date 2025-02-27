@@ -128,9 +128,9 @@ jobs:
 
                   $targetPath = "$NDK_TOOLCHAIN\bin\$targetFile"
                   if (Test-Path $targetPath) {
-                      Copy-Item -Path $targetPath -Destination $file.FullName -Force
+                      Copy-Item -Path "$targetPath.exe" -Destination $file.FullName -Force
                   } else {
-                      Write-Host "Target file $targetFile does not exist skip"
+                      Write-Host "$targetFile.exe does not exist skip"
                   }
               }
           }
