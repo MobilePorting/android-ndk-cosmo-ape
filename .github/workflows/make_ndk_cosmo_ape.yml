@@ -101,30 +101,44 @@ jobs:
           $NDK_TOOLCHAIN = "$NDK/toolchains/llvm/prebuilt/cosmo-universal"
 
           foreach ($file in Get-ChildItem -Path "$NDK_TOOLCHAIN\bin" -File) {
-            $bname = $file.Name
-            $fileType = Get-FileType $file.FullName
+              $bname = $file.Name
+              $fileType = Get-FileType $file.FullName
 
-            if ($fileType -match "DOS/MBR boot sector") {
-              Write-Host "Renaming $bname"
-              Rename-Item -Path $file.FullName -NewName "$($file.Name).exe"
-            }
-            elseif ($fileType -match "a sh script") {
-              Write-Host "Replacing UNIX file $bname"
-              Remove-Item $file.FullName -Force
-              Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MobilePorting/android-ndk-cosmo-ape/main/windows-extra/$($file.Name)" -OutFile "$($file.FullName)"
-              Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MobilePorting/android-ndk-cosmo-ape/main/windows-extra/$($file.Name).cmd" -OutFile "$($file.FullName).cmd"
-            }
+              if ($fileType -match "DOS/MBR boot sector") {
+                  Write-Host "Renaming $bname"
+                  Rename-Item -Path $file.FullName -NewName "$($file.Name).exe"
+              }
+              elseif ($fileType -match "a sh script") {
+                  Write-Host "Replacing UNIX file $bname"
+                  Remove-Item $file.FullName -Force
+                  Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MobilePorting/android-ndk-cosmo-ape/main/windows-extra/$($file.Name)" -OutFile "$($file.FullName)"
+                  Invoke-WebRequest -Uri "https://raw.githubusercontent.com/MobilePorting/android-ndk-cosmo-ape/main/windows-extra/$($file.Name).cmd" -OutFile "$($file.FullName).cmd"
+              }
+          }
+
+          foreach ($file in Get-ChildItem -Path "$NDK_TOOLCHAIN\bin" -File) {
+              $bname = $file.Name
+              $fileType = Get-FileType $file.FullName
+
+              if ($fileType -match "broken symbolic link to `(.*`)") {
+                  $targetFile = $matches[1].Trim()
+
+                  Write-Host "Hard linking $bname"
+                  Remove-Item $file.FullName -Force
+
+                  $targetPath = "$NDK_TOOLCHAIN\bin\$targetFile"
+                  if (Test-Path $targetPath) {
+                      Copy-Item -Path $targetPath -Destination $file.FullName -Force
+                  } else {
+                      Write-Host "Target file $targetFile does not exist skip"
+                  }
+              }
           }
 
           cd ${NDK}/toolchains/llvm/prebuilt
-
-          New-Item -ItemType SymbolicLink -Path "windows-x86_64" -Target "cosmo-universal"
-          New-Item -ItemType SymbolicLink -Path "windows-arm64" -Target "cosmo-universal"
-
+          Rename-Item -Path "cosmo-universal" -NewName "windows-x86_64"
           cd ${NDK}/prebuilt
-
-          New-Item -ItemType SymbolicLink -Path "windows-x86_64" -Target "cosmo-universal"
-          New-Item -ItemType SymbolicLink -Path "windows-arm64" -Target "cosmo-universal"
+          Rename-Item -Path "cosmo-universal" -NewName "windows-x86_64"
 
       - name: Archive Fixed NDK
         run: 7z a -snl -t7z -mx=9 -m0=LZMA2 -md=256m -mfb=273 -mtc=on -mmt=on android-ndk-r${{inputs.ndk_version}}-windows.7z android-ndk-r${{inputs.ndk_version}}
