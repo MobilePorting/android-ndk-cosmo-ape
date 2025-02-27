@@ -127,7 +127,7 @@ jobs:
                   Remove-Item $file.FullName -Force
 
                   $targetPath = "$NDK_TOOLCHAIN\bin\$targetFile"
-                  if (Test-Path $targetPath) {
+                  if (Test-Path "$targetPath.exe") {
                       Copy-Item -Path "$targetPath.exe" -Destination $file.FullName -Force
                   } else {
                       Write-Host "$targetFile.exe does not exist skip"
