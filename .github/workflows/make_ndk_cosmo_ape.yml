@@ -104,6 +104,25 @@ jobs:
               $bname = $file.Name
               $fileType = Get-FileType $file.FullName
 
+              if ($fileType -match "symbolic link to `(.*`)") {
+                  $targetFile = $matches[1].Trim()
+
+                  Write-Host "Hard linking $bname"
+                  Remove-Item $file.FullName -Force
+
+                  $targetPath = "$NDK_TOOLCHAIN\bin\$targetFile"
+                  if (Test-Path "$targetPath") {
+                      Copy-Item -Path "$targetPath" -Destination $file.FullName -Force
+                  } else {
+                      Write-Host "$targetFile does not exist skip"
+                  }
+              }
+          }
+
+          foreach ($file in Get-ChildItem -Path "$NDK_TOOLCHAIN\bin" -File) {
+              $bname = $file.Name
+              $fileType = Get-FileType $file.FullName
+
               if ($fileType -match "DOS/MBR boot sector") {
                   Write-Host "Renaming $bname"
                   Rename-Item -Path $file.FullName -NewName "$($file.Name).exe"
@@ -116,25 +135,12 @@ jobs:
               }
           }
 
-          foreach ($file in Get-ChildItem -Path "$NDK_TOOLCHAIN\bin" -File) {
-              $bname = $file.Name
-              $fileType = Get-FileType $file.FullName
-
-              if ($fileType -match "broken symbolic link to `(.*`)") {
-                  $targetFile = $matches[1].Trim()
-
-                  Write-Host "Hard linking $bname"
-                  Remove-Item $file.FullName -Force
-
-                  $targetPath = "$NDK_TOOLCHAIN\bin\$targetFile"
-                  if (Test-Path "$targetPath.exe") {
-                      Copy-Item -Path "$targetPath.exe" -Destination $file.FullName -Force
-                  } else {
-                      Write-Host "$targetFile.exe does not exist skip"
-                  }
-              }
-          }
-
+          Write-Host "Running Windows Exclusive Fixes..."
+          Remove-Item $NDK_TOOLCHAIN\bin\clang-19.exe
+          Remove-Item $NDK_TOOLCHAIN\bin\ld64.lld.exe
+          Remove-Item $NDK_TOOLCHAIN\bin\lld-link.exe
+          Remove-Item $NDK_TOOLCHAIN\bin\lld.exe
+          Copy-Item -Path "$NDK_TOOLCHAIN\bin\clang-cl.exe" -Destination "$NDK_TOOLCHAIN\bin\clang.exe" -Force
           cd ${NDK}/toolchains/llvm/prebuilt
           Rename-Item -Path "cosmo-universal" -NewName "windows-x86_64"
           cd ${NDK}/prebuilt
